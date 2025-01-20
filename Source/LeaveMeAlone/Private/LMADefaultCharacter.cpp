@@ -15,7 +15,7 @@ ALMADefaultCharacter::ALMADefaultCharacter()
 {
 
 	PrimaryActorTick.bCanEverTick = true;
-
+	WalkSpeed = GetCharacterMovement()->MaxWalkSpeed; // Базовая скорость
 	HealthComponent = CreateDefaultSubobject<ULMAHealthComponent>("HealthComponent");
 
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
@@ -52,10 +52,24 @@ void ALMADefaultCharacter::BeginPlay()
 	HealthComponent->OnHealthChanged.AddUObject(this, &ALMADefaultCharacter::OnHealthChanged);
 }
 
+
 // Called every frame
 void ALMADefaultCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+  if (bIsSprinting) {
+    if (CurrentStamina > 0) {
+      CurrentStamina -= StaminaDrainRate * DeltaTime;
+      if (CurrentStamina <= 0) {
+        StopSprinting();
+      }
+    }
+  } else {
+    if (CurrentStamina < MaxStamina) {
+      CurrentStamina += StaminaRegenRate * DeltaTime;
+    }
+  }
 
   if (!(HealthComponent->IsDead())) {
     RotationPlayerOnCursor();
@@ -102,7 +116,8 @@ void ALMADefaultCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAxis("MoveForward", this, &ALMADefaultCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ALMADefaultCharacter::MoveRight);
     PlayerInputComponent->BindAxis("Zoom", this, &ALMADefaultCharacter::ZoomCamera);
-
+    PlayerInputComponent->BindAction("Sprint", IE_Pressed, this,&ALMADefaultCharacter::StartSprinting);
+    PlayerInputComponent->BindAction( "Sprint", IE_Released, this ,&ALMADefaultCharacter::StopSprinting);
 }
 void ALMADefaultCharacter::MoveForward(float Value)
 {
@@ -121,4 +136,15 @@ void ALMADefaultCharacter::ZoomCamera(float Value) {
     SpringArmComponent->TargetArmLength = NewArmLength;
 	ArmLength = NewArmLength;
   }
+}
+void ALMADefaultCharacter::StartSprinting() {
+  if (CurrentStamina > 0) {
+    bIsSprinting = true;
+    GetCharacterMovement()->MaxWalkSpeed = WalkSpeed * SpeedMultiplier;
+  }
+}
+
+void ALMADefaultCharacter::StopSprinting() {
+  bIsSprinting = false;
+  GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 }

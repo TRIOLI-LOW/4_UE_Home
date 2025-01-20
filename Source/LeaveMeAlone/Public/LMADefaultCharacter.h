@@ -20,6 +20,9 @@ class LEAVEMEALONE_API ALMADefaultCharacter : public ACharacter
 	// Sets default values for this character's properties
 	ALMADefaultCharacter();
 public:
+        // Getter дл€ анимации
+    UFUNCTION(BlueprintCallable, Category = "Animation")
+    bool IsSprinting() const { return bIsSprinting; }
     UFUNCTION()
     ULMAHealthComponent *GetHealthComponent() const { return HealthComponent;}
 
@@ -43,12 +46,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cursor")
 	FVector CursorSize = FVector(20.0f, 40.0f, 40.0f);
 
+
+
 	virtual void BeginPlay() override;
 
 private:
 	void MoveForward(float Value);
 	void MoveRight(float Value);
     void ZoomCamera(float Value);
+    void Sprint(float Value);
+
 
     float MinArmLength = 500.0f; 
     float MaxArmLength = 2000.0f; 
@@ -57,14 +64,27 @@ private:
 	float YRotation = -75.0f; // отвечает за поворот камеры по оси Y.
 	float ArmLength = 1400.0f; // отвечает за длину штатива.
 	float FOV = 55.0f; // отвечает за поле зрени€ камеры.
+	
+	float MaxStamina = 100.0f;
+    float CurrentStamina = MaxStamina;
+    float StaminaDrainRate = 20.0f;
+    float StaminaRegenRate = 10.0f;//¬осстановление
+    float SpeedMultiplier = 1.7f; // множитель скорости персонажа при спринте
+    bool  bIsSprinting = false; // ‘лаг дл€ спринта
+    float WalkSpeed; // ’ранение базовой скорости ходьбы
+
+	void StartSprinting();
+    void StopSprinting();
+
 
 	void OnDeath();
     void OnHealthChanged(float NewHealth);
     void RotationPlayerOnCursor();
-      public:	
+
+    public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+        
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
