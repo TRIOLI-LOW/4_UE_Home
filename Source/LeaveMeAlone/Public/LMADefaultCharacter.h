@@ -46,6 +46,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cursor")
 	FVector CursorSize = FVector(20.0f, 40.0f, 40.0f);
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+    bool bIsSprinting = false; // Флаг для спринта
 
 
 	virtual void BeginPlay() override;
@@ -54,7 +56,7 @@ private:
 	void MoveForward(float Value);
 	void MoveRight(float Value);
     void ZoomCamera(float Value);
-    void Sprint(float Value);
+    
 
 
     float MinArmLength = 500.0f; 
@@ -70,7 +72,7 @@ private:
     float StaminaDrainRate = 20.0f;
     float StaminaRegenRate = 10.0f;//Восстановление
     float SpeedMultiplier = 1.7f; // множитель скорости персонажа при спринте
-    bool  bIsSprinting = false; // Флаг для спринта
+    
     float WalkSpeed; // Хранение базовой скорости ходьбы
 
 	void StartSprinting();
