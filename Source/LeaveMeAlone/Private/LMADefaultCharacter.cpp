@@ -137,6 +137,10 @@ void ALMADefaultCharacter::ZoomCamera(float Value) {
 	ArmLength = NewArmLength;
   }
 }
+
+//void ALMADefaultCharacter::Sprint(float Value) {
+//}
+
 void ALMADefaultCharacter::StartSprinting() {
   if (CurrentStamina > 0) {
     bIsSprinting = true;

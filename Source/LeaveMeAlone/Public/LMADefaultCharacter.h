@@ -56,7 +56,7 @@ private:
 	void MoveForward(float Value);
 	void MoveRight(float Value);
     void ZoomCamera(float Value);
-    
+    void Sprint(float Value);
 
 
     float MinArmLength = 500.0f; 
