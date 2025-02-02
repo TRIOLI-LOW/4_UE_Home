@@ -10,6 +10,8 @@ class UCameraComponent; // будет отвечать за компонент камеры.
 class USpringArmComponent; // используется для автоматического управления поведением камеры вситуациях, когда она становится закрытой.
 class ULMAHealthComponent;
 class UAnimMontage;
+class ULMAWeaponComponent;
+
 
 UCLASS()
 class LEAVEMEALONE_API ALMADefaultCharacter : public ACharacter
@@ -17,7 +19,6 @@ class LEAVEMEALONE_API ALMADefaultCharacter : public ACharacter
 { 
 	GENERATED_BODY()
 
-	// Sets default values for this character's properties
 	ALMADefaultCharacter();
 public:
         // Getter для анимации
@@ -25,14 +26,17 @@ public:
     bool IsSprinting() const { return bIsSprinting; }
     UFUNCTION()
     ULMAHealthComponent *GetHealthComponent() const { return HealthComponent;}
+    FTimerHandle FireTimerHandle;
+protected:
 
-      protected:
-
-    UPROPERTY(EditDefaultsOnly, Category = "Animation")
+    UPROPERTY(EditDefaultsOnly, Category = "Animation") // Death
     UAnimMontage *DeathMontage;
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components|Health")
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components|Health") // Health
     ULMAHealthComponent* HealthComponent;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+    ULMAWeaponComponent *WeaponComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	USpringArmComponent* SpringArmComponent;
@@ -49,14 +53,13 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
     bool bIsSprinting = false; // Флаг для спринта
 
-
 	virtual void BeginPlay() override;
 
 private:
 	void MoveForward(float Value);
 	void MoveRight(float Value);
     void ZoomCamera(float Value);
-    void Sprint(float Value);
+    
 
 
     float MinArmLength = 500.0f; 
@@ -75,15 +78,16 @@ private:
     
     float WalkSpeed; // Хранение базовой скорости ходьбы
 
+
 	void StartSprinting();
     void StopSprinting();
-
 
 	void OnDeath();
     void OnHealthChanged(float NewHealth);
     void RotationPlayerOnCursor();
 
     public:	
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
         

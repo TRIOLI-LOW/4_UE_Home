@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/LMAHealthComponent.h"
+#include "Components/LMAWeaponComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Engine/Engine.h"
 
@@ -15,8 +16,9 @@ ALMADefaultCharacter::ALMADefaultCharacter()
 {
 
 	PrimaryActorTick.bCanEverTick = true;
+	WeaponComponent = CreateDefaultSubobject<ULMAWeaponComponent>("Weapon"); // WeaponComponent
 	WalkSpeed = GetCharacterMovement()->MaxWalkSpeed; // Базовая скорость
-	HealthComponent = CreateDefaultSubobject<ULMAHealthComponent>("HealthComponent");
+	HealthComponent = CreateDefaultSubobject<ULMAHealthComponent>("HealthComponent"); // HealthComponent
 
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
 	SpringArmComponent->SetupAttachment(GetRootComponent());
@@ -36,6 +38,28 @@ ALMADefaultCharacter::ALMADefaultCharacter()
 	bUseControllerRotationRoll = false;
 }
 
+// Called to bind functionality to input
+void ALMADefaultCharacter::SetupPlayerInputComponent(
+    UInputComponent *PlayerInputComponent) {
+  Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+  PlayerInputComponent->BindAxis("MoveForward", this,
+                                 &ALMADefaultCharacter::MoveForward);
+  PlayerInputComponent->BindAxis("MoveRight", this,
+                                 &ALMADefaultCharacter::MoveRight);
+  PlayerInputComponent->BindAxis("Zoom", this,
+                                 &ALMADefaultCharacter::ZoomCamera);
+  PlayerInputComponent->BindAction("Sprint", IE_Pressed, this,
+                                   &ALMADefaultCharacter::StartSprinting);
+  PlayerInputComponent->BindAction("Sprint", IE_Released, this,
+                                   &ALMADefaultCharacter::StopSprinting);
+  PlayerInputComponent->BindAction("Fire", IE_Pressed, WeaponComponent,
+                                   &ULMAWeaponComponent::StartFire);
+  PlayerInputComponent->BindAction("Fire", IE_Released, WeaponComponent,
+                                   &ULMAWeaponComponent::StopFire);
+  PlayerInputComponent->BindAction("Reload", IE_Pressed, WeaponComponent,
+                                   &ULMAWeaponComponent::Reload);
+}
 // Called when the game starts or when spawned
 void ALMADefaultCharacter::BeginPlay()
 {
@@ -104,21 +128,11 @@ void ALMADefaultCharacter::OnDeath() {
 }
 
 void ALMADefaultCharacter::OnHealthChanged(float NewHealth) {
-  GEngine->AddOnScreenDebugMessage(
+    GEngine->AddOnScreenDebugMessage(
       -1, 2.0f, FColor::Red, FString::Printf(TEXT("Health = %f"), NewHealth));
+
 }
 
-// Called to bind functionality to input
-void ALMADefaultCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	PlayerInputComponent->BindAxis("MoveForward", this, &ALMADefaultCharacter::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &ALMADefaultCharacter::MoveRight);
-    PlayerInputComponent->BindAxis("Zoom", this, &ALMADefaultCharacter::ZoomCamera);
-    PlayerInputComponent->BindAction("Sprint", IE_Pressed, this,&ALMADefaultCharacter::StartSprinting);
-    PlayerInputComponent->BindAction( "Sprint", IE_Released, this ,&ALMADefaultCharacter::StopSprinting);
-}
 void ALMADefaultCharacter::MoveForward(float Value)
 {
 	AddMovementInput(GetActorForwardVector(), Value);
@@ -138,8 +152,7 @@ void ALMADefaultCharacter::ZoomCamera(float Value) {
   }
 }
 
-//void ALMADefaultCharacter::Sprint(float Value) {
-//}
+
 
 void ALMADefaultCharacter::StartSprinting() {
   if (CurrentStamina > 0) {
