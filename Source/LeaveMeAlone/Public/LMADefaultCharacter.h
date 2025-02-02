@@ -26,7 +26,7 @@ public:
     bool IsSprinting() const { return bIsSprinting; }
     UFUNCTION()
     ULMAHealthComponent *GetHealthComponent() const { return HealthComponent;}
-    FTimerHandle FireTimerHandle;
+    
 protected:
 
     UPROPERTY(EditDefaultsOnly, Category = "Animation") // Death
