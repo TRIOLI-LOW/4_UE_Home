@@ -23,6 +23,9 @@ public:
   UFUNCTION()
   void OnOutOfAmmo();
 
+  UFUNCTION(BlueprintCallable)
+  bool GetCurrentWeaponAmmo(FAmmoWeapon &AmmoWeapon) const;
+
 protected:
   UPROPERTY(EditDefaultsOnly, Category = "Weapon")
   TSubclassOf<ALMABaseWeapon> WeaponClass;

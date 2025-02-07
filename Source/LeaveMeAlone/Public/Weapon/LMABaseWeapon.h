@@ -26,6 +26,7 @@ struct FAmmoWeapon {
   bool Infinite;
 };
 
+
 UCLASS()
 class LEAVEMEALONE_API ALMABaseWeapon : public AActor {
   GENERATED_BODY()
@@ -37,6 +38,7 @@ public:
   void ChangeClip();
   FOnOutOfAmmo OnOutOfAmmo;
   bool IsClipFull() const;
+  FAmmoWeapon GetCurrentAmmoWeapon() const { return CurrentAmmoWeapon; };
 
 protected:
   UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Weapon")
